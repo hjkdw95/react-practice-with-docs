@@ -51,12 +51,13 @@ import './index.css';
         history: [{ // 게임 돌아갈 때 히스토리 받아올 것임
           squares: Array(9).fill(null),
         }],
+        stepNumber: 0, // indicate which step we’re currently viewing.
         xIsNext: true
       }
     }
 
     handleClick(i) {
-      const history = this.state.history;
+      const history = this.state.history.slice(0, this.state.stepNumber + 1);
       const current = history[history.length - 1];
       const squares = current.squares.slice();
       if (calculateWinner(squares) || squares[i]) { //winner이 나왔거나 squares가 이미 채워져 있다면
@@ -67,13 +68,22 @@ import './index.css';
         history: history.concat([{ // Unlike the array push() method you might be more familiar with, the concat() method doesn’t mutate the original array, so we prefer it.
           squares: squares,
         }]),
+        stepNumber: history.length,
         xIsNext: !this.state.xIsNext,
+      });
+    }
+
+    // update stepNumber
+    jumpTo(step) {
+      this.setState({
+        stepNumber: step,
+        xIsNext: (step % 2) === 0, // x는 짝수일 때(0부터 시작하니까) y는 홀수일때
       });
     }
 
     render() {
       const history = this.state.history;
-      const current = history[history.length - 1]; //?
+      const current = history[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
 
       const moves = history.map((step, move) => {
@@ -82,7 +92,7 @@ import './index.css';
           "Go to game start";
 
           return (
-            <li>
+            <li key = {move}>
               <button onClick = { () => this.jumpTo(move) }>{desc}</button>
             </li>
           );
@@ -105,7 +115,7 @@ import './index.css';
           </div>
           <div className="game-info">
             <div>{ status }</div>
-            <ol>{/* TODO */}</ol>
+            <ol>{moves}</ol>
           </div>
         </div>
       );
@@ -139,5 +149,16 @@ import './index.css';
     document.getElementById('root')
   );
   
+
+  /*
+  If you have extra time or want to practice your new React skills, here are some ideas for improvements that you could make to the tic-tac-toe game which are listed in order of increasing difficulty:
+
+  1. Display the location for each move in the format (col, row) in the move history list.
+  2. Bold the currently selected item in the move list.
+  3. Rewrite Board to use two loops to make the squares instead of hardcoding them.
+  4. Add a toggle button that lets you sort the moves in either ascending or descending order.
+When someone wins, highlight the three squares that caused the win.
+When no one wins, display a message about the result being a draw.
+*/
 
   
